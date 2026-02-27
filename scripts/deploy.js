@@ -1,22 +1,18 @@
 const hre = require("hardhat");
 
 async function main() {
-  const EMRTreeLedger = await hre.ethers.getContractFactory("EMRTreeLedger");
-  const emrTreeLedger = await EMRTreeLedger.deploy();
-  await emrTreeLedger.deployed();
-
-  console.log("EMRTreeLedger deployed to:", emrTreeLedger.address);
-  console.log("Deployment transaction hash:", emrTreeLedger.deployTransaction.hash);
-  
   const [deployer] = await hre.ethers.getSigners();
+  const Factory = await hre.ethers.getContractFactory("EMRTreeLedger");
+  const emr = await Factory.deploy();
+  await emr.waitForDeployment();
+
+  const address = await emr.getAddress();
+  const balance = await hre.ethers.provider.getBalance(deployer.address);
+
+  console.log("EMRTreeLedger deployed to:", address);
   console.log("Deployed by:", deployer.address);
-  
-  const balance = await deployer.getBalance();
-  console.log("Deployer balance:", hre.ethers.utils.formatEther(balance), "ETH");
-  
-  console.log("\n Contract Details:");
-  console.log("   Branch Counter:", await emrTreeLedger.branchCounter());
-  console.log("   1. Contract address:", emrTreeLedger.address);
+  console.log("Deployer balance:", hre.ethers.formatEther(balance), "ETH");
+  console.log("Branch Counter:", await emr.branchCounter());
 }
 
 main()

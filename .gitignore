@@ -4,13 +4,12 @@ coverage
 coverage.json
 typechain
 typechain-types
-
 cache
 artifacts
-
+frontend/dist
+frontend/node_modules
 .idea
 .vscode
 *.swp
 *.swo
-
 .DS_Store
