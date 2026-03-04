@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000";
+export const CONTRACT_ADDRESS = "0xA7f2EC8eF9293e3003919797Bd4998Db0ba33CB7";
 
 export const ABI = [
   "event PatientRegistered(address indexed patient)",

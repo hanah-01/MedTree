@@ -15,13 +15,13 @@ const TABS = [
 ];
 
 export default function App() {
-  const wallet        = useWallet();
+  const wallet = useWallet();
   const { loading: contractLoading, createGenesisBlock, createCollisionBlock, addBlockToBranch, fetchPatientData } =
     useContract(wallet.signer, wallet.provider);
   const { toasts, dismiss } = useToast();
 
-  const [tab,       setTab]       = useState("tree");
-  const [patient,   setPatient]   = useState(null);
+  const [tab, setTab]= useState("tree");
+  const [patient, setPatient]= useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadData = useCallback(async () => {
@@ -128,6 +128,11 @@ export default function App() {
         </div>
       ) : (
         <div className="dashboard">
+          {wallet.chainId !== 11155111 && (
+            <div className="status-bar fade-up" style={{ background: "var(--accent-warn, #f59e0b)", color: "#fff", justifyContent: "center", gap: 8 }}>
+              Wrong network! Please switch MetaMask to <strong>Sepolia</strong> (currently on Chain {wallet.chainId}).
+            </div>
+          )}
           <div className="status-bar fade-up">
             <span className="status-dot" style={{ background: isRegistered ? "var(--accent-2)" : "var(--accent-warn)" }} />
             <span>

@@ -68,8 +68,8 @@ export function useContract(signer, provider) {
 
   const fetchPatientData = useCallback(
     async (address) => {
-      const contract = getContract();
-      if (!contract) return null;
+      if (!provider) return null;
+      const contract = getContract(provider);
 
       const isReg = await contract.isPatientRegistered(address);
       if (!isReg) return { registered: false, branches: [] };
@@ -94,7 +94,7 @@ export function useContract(signer, provider) {
 
       return { registered: true, branches };
     },
-    [getContract]
+    [getContract, provider]
   );
 
   return {

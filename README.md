@@ -48,33 +48,22 @@ EMR/
 ├── contracts/
 │   └── EMRTreeLedger.sol        # Core smart contract
 ├── scripts/
-│   ├── deploy.js                # Deploy to local/testnet
-│   └── interact.js              # CLI interaction example
-├── test/
-│   └── EMRTreeLedger.test.js    # 22 unit tests
+│   └── interact.js             
+│   └── EMRTreeLedger.test.js   
 ├── frontend/
 │   ├── index.html
-│   ├── vite.config.js
 │   └── src/
-│       ├── App.jsx              # Main app (tabs, routing)
-│       ├── App.css              # Layout & component styles
-│       ├── components/
-│       │   ├── Display.jsx      # Header, BranchTree, Toast
-│       │   └── Forms.jsx        # CreateGenesis, CreateCollision, AddBlock
+│       ├── App.css             
+│       │   ├── Display.jsx      
 │       ├── hooks/
 │       │   ├── useWallet.js     # MetaMask connection
 │       │   ├── useContract.js   # Contract read/write
-│       │   └── useToast.js      # Notifications
 │       ├── styles/
-│       │   └── globals.css      # Design system (dark glassmorphism)
 │       └── utils/
 │           └── abi.js           # Contract ABI + address
 ├── hardhat.config.js
-└── package.json
 ```
-
 ## Prerequisites
-
 - [Node.js](https://nodejs.org/) v18+
 - [MetaMask](https://metamask.io/) browser extension
 
@@ -83,26 +72,35 @@ EMR/
 ### 1. Install Dependencies
 
 ```bash
-cd EMR
 npm install
+
 cd frontend && npm install && cd ..
+
 ```
 
 ### 2. Compile the Smart Contract
 
+
+
 ```bash
+
 npm run compile
+
 ```
 
 ### 3. Run Tests
 
-```bash
-npm test
+
+
 ```
+
+
 
 Expected output: **22 passing** tests covering deployment, genesis blocks, collision blocks, branch operations, multi-patient isolation, and DAG structure.
 
 ### 4. Start Local Blockchain
+
+
 
 ```bash
 npm run node
@@ -110,9 +108,13 @@ npm run node
 
 This starts a Hardhat node at `http://127.0.0.1:8545` (Chain ID 1337) with 20 pre-funded test accounts. Keep this terminal open.
 
+
+
 ### 5. Deploy the Contract
 
+
 Open a **new terminal**:
+
 
 ```bash
 npm run deploy

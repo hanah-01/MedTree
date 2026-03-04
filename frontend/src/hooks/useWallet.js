@@ -45,12 +45,27 @@ export function useWallet() {
   useEffect(() => {
     if (!window.ethereum) return;
 
-    const handleAccounts = (accounts) => {
-      if (accounts.length === 0) disconnect();
-      else setAddress(accounts[0]);
+    const reinit = async () => {
+      try {
+        const accounts = await window.ethereum.request({ method: "eth_accounts" });
+        if (accounts.length === 0) { disconnect(); return; }
+        const _provider = new ethers.BrowserProvider(window.ethereum);
+        const _signer   = await _provider.getSigner();
+        const _address  = await _signer.getAddress();
+        const _network  = await _provider.getNetwork();
+        setProvider(_provider);
+        setSigner(_signer);
+        setAddress(_address);
+        setChainId(Number(_network.chainId));
+      } catch {}
     };
 
-    const handleChain = (id) => setChainId(parseInt(id, 16));
+    const handleAccounts = (accounts) => {
+      if (accounts.length === 0) disconnect();
+      else reinit();
+    };
+
+    const handleChain = () => reinit();
 
     window.ethereum.on("accountsChanged", handleAccounts);
     window.ethereum.on("chainChanged",    handleChain);
