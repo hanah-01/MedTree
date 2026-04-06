@@ -2,17 +2,18 @@ import { useState, useEffect, useCallback } from "react";
 import { useWallet } from "./hooks/useWallet";
 import { useContract } from "./hooks/useContract";
 import { useToast, toast } from "./hooks/useToast";
-import { Header, ToastContainer, BranchTree } from "./components/Display";
+import { Header, ToastContainer, BranchTree, AnalyticsDashboard } from "./components/Display";
 import { CreateGenesis, CreateCollision, AddBlock, DoctorAccessForm } from "./components/Forms";
 import "./styles/globals.css";
 import "./App.css";
 
 const TABS = [
-  { id: "tree",    label: "My EMR Tree",       icon: "🌳" },
-  { id: "genesis", label: "New Patient",        icon: "🌱" },
-  { id: "fork",    label: "Fork Branch",        icon: "🔀" },
-  { id: "add",     label: "Add Record",         icon: "➕" },
-  { id: "access",  label: "Doctor Access",      icon: "⚕️" },
+  { id: "tree",      label: "My EMR Tree",       icon: "🌳" },
+  { id: "analytics", label: "Analytics",         icon: "📊" },
+  { id: "genesis",   label: "New Patient",       icon: "🌱" },
+  { id: "fork",      label: "Fork Branch",       icon: "🔀" },
+  { id: "add",       label: "Add Record",        icon: "➕" },
+  { id: "access",    label: "Doctor Access",     icon: "⚕️" },
 ];
 
 export default function App() {
@@ -147,9 +148,9 @@ export default function App() {
         </div>
       ) : (
         <div className="dashboard">
-          {wallet.chainId !== 11155111 && (
+          {(![11155111, 421614, 80002].includes(wallet.chainId)) && (
             <div className="status-bar fade-up" style={{ background: "var(--accent-warn, #f59e0b)", color: "#fff", justifyContent: "center", gap: 8 }}>
-              Wrong network! Please switch MetaMask to <strong>Sepolia</strong> (currently on Chain {wallet.chainId}).
+              Wrong network! Please switch to <strong>Sepolia, Arbitrum Sepolia, or Polygon Amoy</strong> (currently on Chain {wallet.chainId}).
             </div>
           )}
           <div className="status-bar fade-up">
@@ -165,7 +166,7 @@ export default function App() {
           <div className="tabs fade-up">
             {TABS.map((t) => {
               const isDisabled =
-                !isRegistered && (t.id === "fork" || t.id === "add" || t.id === "access");
+                !isRegistered && (t.id === "fork" || t.id === "add" || t.id === "access" || t.id === "analytics");
               return (
                 <button
                   key={t.id}
@@ -182,6 +183,9 @@ export default function App() {
           <div className="tab-content">
             {tab === "tree" && (
               <BranchTree branches={branches} onRefresh={loadData} loading={isBusy} />
+            )}
+            {tab === "analytics" && isRegistered && (
+              <AnalyticsDashboard branches={branches} />
             )}
             {tab === "genesis" && (
               <CreateGenesis onCreate={handleGenesis} loading={isBusy} />

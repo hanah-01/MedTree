@@ -1,15 +1,22 @@
+import React from "react";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+
 export function Header({ address, shortAddress, chainId, onConnect, onDisconnect, loading }) {
   const networkLabel =
     chainId === 1 ? "Mainnet"
     : chainId === 11155111 ? "Sepolia"
+    : chainId === 421614 ? "Arbitrum Sepolia"
+    : chainId === 80002 ? "Polygon Amoy"
     : chainId === 1337 ? "Localhost"
     : chainId ? `Chain ${chainId}`
     : null;
 
   const networkColor =
     chainId === 11155111 ? "badge-blue"
-    : chainId === 1337 ? "badge-green"
-    : "badge-yellow";
+    : chainId === 421614 ? "badge-blue"
+    : chainId === 80002 ? "badge-green"
+    : chainId === 1337 ? "badge-yellow"
+    : "badge-gray";
 
   return (
     <header className="app-header glass fade-up">
@@ -140,6 +147,71 @@ export function BranchTree({ branches, onRefresh, loading }) {
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+export function AnalyticsDashboard({ branches }) {
+  if (!branches || branches.length === 0) return null;
+
+  const totalBranches = branches.length;
+  const totalBlocks = branches.reduce((acc, b) => acc + b.blocks.length, 0);
+
+  let timeline = [];
+  branches.forEach((b) => {
+    b.blocks.forEach((blk) => {
+      if (blk.timestamp) {
+        timeline.push({ date: new Date(blk.timestamp * 1000).toLocaleDateString(), time: blk.timestamp });
+      }
+    });
+  });
+
+  timeline.sort((a, b) => a.time - b.time);
+  let cumulative = 0;
+  const chartData = timeline.map(entry => {
+    cumulative += 1;
+    return { name: entry.date, Records: cumulative };
+  });
+
+  return (
+    <div className="analytics-dashboard fade-up">
+      <div className="panel-header">
+        <span className="panel-icon">📊</span>
+        <div>
+          <h2 className="panel-title">EMR Analytics Dashboard</h2>
+          <p className="panel-sub">Visualize the growth and structure of your Medical Records.</p>
+        </div>
+      </div>
+      
+      <div className="stats-grid">
+        <div className="stat-card glass">
+          <div className="stat-title">Total Branches</div>
+          <div className="stat-value">{totalBranches}</div>
+          <div className="stat-desc">Divergent Treatment Paths</div>
+        </div>
+        <div className="stat-card glass">
+          <div className="stat-title">Total Records</div>
+          <div className="stat-value">{totalBlocks}</div>
+          <div className="stat-desc">Encrypted Health Blocks</div>
+        </div>
+        <div className="stat-card glass">
+          <div className="stat-title">Average Depth</div>
+          <div className="stat-value">{(totalBlocks / totalBranches).toFixed(1)}</div>
+          <div className="stat-desc">Blocks per Branch</div>
+        </div>
+      </div>
+
+      <div className="chart-container glass" style={{ marginTop: '20px', padding: '20px', borderRadius: '12px' }}>
+        <h3 style={{ marginBottom: '15px', fontSize: '1.2rem', color: 'var(--text-1)' }}>Tree Growth Over Time</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={chartData}>
+            <XAxis dataKey="name" stroke="#8884d8" />
+            <YAxis stroke="#8884d8" />
+            <Tooltip contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', borderColor: '#334155', color: '#fff' }} />
+            <Line type="monotone" dataKey="Records" stroke="#0ea5e9" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
