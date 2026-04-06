@@ -66,6 +66,36 @@ export function useContract(signer, provider) {
     [signer, getContract]
   );
 
+  const grantAccess = useCallback(
+    async (doctorAddr) => {
+      setLoading(true);
+      try {
+        const contract = getContract(signer);
+        const tx = await contract.grantAccess(doctorAddr);
+        const receipt = await tx.wait();
+        return { success: true, tx, receipt };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [signer, getContract]
+  );
+
+  const revokeAccess = useCallback(
+    async (doctorAddr) => {
+      setLoading(true);
+      try {
+        const contract = getContract(signer);
+        const tx = await contract.revokeAccess(doctorAddr);
+        const receipt = await tx.wait();
+        return { success: true, tx, receipt };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [signer, getContract]
+  );
+
   const fetchPatientData = useCallback(
     async (address) => {
       if (!provider) return null;
@@ -102,6 +132,8 @@ export function useContract(signer, provider) {
     createGenesisBlock,
     createCollisionBlock,
     addBlockToBranch,
+    grantAccess,
+    revokeAccess,
     fetchPatientData,
   };
 }

@@ -3,7 +3,7 @@ import { useWallet } from "./hooks/useWallet";
 import { useContract } from "./hooks/useContract";
 import { useToast, toast } from "./hooks/useToast";
 import { Header, ToastContainer, BranchTree } from "./components/Display";
-import { CreateGenesis, CreateCollision, AddBlock } from "./components/Forms";
+import { CreateGenesis, CreateCollision, AddBlock, DoctorAccessForm } from "./components/Forms";
 import "./styles/globals.css";
 import "./App.css";
 
@@ -12,11 +12,12 @@ const TABS = [
   { id: "genesis", label: "New Patient",        icon: "🌱" },
   { id: "fork",    label: "Fork Branch",        icon: "🔀" },
   { id: "add",     label: "Add Record",         icon: "➕" },
+  { id: "access",  label: "Doctor Access",      icon: "⚕️" },
 ];
 
 export default function App() {
   const wallet = useWallet();
-  const { loading: contractLoading, createGenesisBlock, createCollisionBlock, addBlockToBranch, fetchPatientData } =
+  const { loading: contractLoading, createGenesisBlock, createCollisionBlock, addBlockToBranch, grantAccess, revokeAccess, fetchPatientData } =
     useContract(wallet.signer, wallet.provider);
   const { toasts, dismiss } = useToast();
 
@@ -69,6 +70,24 @@ export default function App() {
       setTab("tree");
     } catch (err) {
       toast("error", err.reason ?? err.message ?? "Transaction failed");
+    }
+  };
+
+  const handleGrant = async (doctorAddr) => {
+    try {
+      await grantAccess(doctorAddr);
+      toast("success", `Access granted to doctor: ${doctorAddr.slice(0, 8)}...`);
+    } catch (err) {
+      toast("error", err.reason ?? err.message ?? "Failed to grant access");
+    }
+  };
+
+  const handleRevoke = async (doctorAddr) => {
+    try {
+      await revokeAccess(doctorAddr);
+      toast("success", `Access revoked for doctor: ${doctorAddr.slice(0, 8)}...`);
+    } catch (err) {
+      toast("error", err.reason ?? err.message ?? "Failed to revoke access");
     }
   };
 
@@ -146,7 +165,7 @@ export default function App() {
           <div className="tabs fade-up">
             {TABS.map((t) => {
               const isDisabled =
-                !isRegistered && (t.id === "fork" || t.id === "add");
+                !isRegistered && (t.id === "fork" || t.id === "add" || t.id === "access");
               return (
                 <button
                   key={t.id}
@@ -172,6 +191,9 @@ export default function App() {
             )}
             {tab === "add" && isRegistered && (
               <AddBlock branches={branches} onAdd={handleAdd} loading={isBusy} />
+            )}
+            {tab === "access" && isRegistered && (
+              <DoctorAccessForm onGrant={handleGrant} onRevoke={handleRevoke} loading={isBusy} />
             )}
           </div>
         </div>

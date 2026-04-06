@@ -1,13 +1,52 @@
 import { useState } from "react";
 
+const uploadToPinata = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${import.meta.env.VITE_PINATA_JWT}`
+    },
+    body: formData
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to upload to Pinata IPFS');
+  }
+
+  const data = await res.json();
+  return data.IpfsHash; 
+};
+
 export function CreateGenesis({ onCreate, loading }) {
   const [metadata, setMetadata] = useState("");
+  const [file, setFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!metadata.trim()) return;
-    onCreate(metadata.trim());
+    
+    let finalMetadata = metadata.trim();
+    if (file) {
+      setUploading(true);
+      try {
+        const cid = await uploadToPinata(file);
+        finalMetadata += ` | IPFS CID: ${cid}`;
+      } catch (err) {
+        console.error(err);
+        alert("IPFS Upload Failed. Check Pinata JWT in .env.local");
+        setUploading(false);
+        return;
+      }
+      setUploading(false);
+    }
+
+    onCreate(finalMetadata);
     setMetadata("");
+    setFile(null);
   };
 
   return (
@@ -31,8 +70,16 @@ export function CreateGenesis({ onCreate, loading }) {
             required
           />
         </div>
-        <button className="btn btn-primary w-full" type="submit" disabled={loading || !metadata.trim()}>
-          {loading ? <><span className="spinner" /> Submitting…</> : <><span>⛓️</span> Create Genesis Block</>}
+        <div className="input-group">
+          <label className="input-label">Upload Medical Record (IPFS)</label>
+          <input 
+            type="file" 
+            className="input" 
+            onChange={(e) => setFile(e.target.files[0])} 
+          />
+        </div>
+        <button className="btn btn-primary w-full" type="submit" disabled={loading || uploading || !metadata.trim()}>
+          {loading || uploading ? <><span className="spinner" /> {uploading ? "Uploading to IPFS…" : "Submitting…"}</> : <><span>⛓️</span> Create Genesis Block</>}
         </button>
       </form>
     </div>
@@ -120,11 +167,30 @@ export function CreateCollision({ branches, onFork, loading }) {
 export function AddBlock({ branches, onAdd, loading }) {
   const [branchId, setBranchId] = useState("");
   const [metadata, setMetadata] = useState("");
+  const [file, setFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onAdd(Number(branchId), metadata.trim());
+    let finalMetadata = metadata.trim();
+
+    if (file) {
+      setUploading(true);
+      try {
+        const cid = await uploadToPinata(file);
+        finalMetadata += ` | IPFS CID: ${cid}`;
+      } catch (err) {
+        console.error(err);
+        alert("IPFS Upload Failed. Check Pinata JWT in .env.local");
+        setUploading(false);
+        return;
+      }
+      setUploading(false);
+    }
+
+    onAdd(Number(branchId), finalMetadata);
     setMetadata("");
+    setFile(null);
   };
 
   return (
@@ -162,13 +228,72 @@ export function AddBlock({ branches, onAdd, loading }) {
             required
           />
         </div>
+        <div className="input-group">
+          <label className="input-label">Upload Medical File (IPFS)</label>
+          <input 
+            type="file" 
+            className="input" 
+            onChange={(e) => setFile(e.target.files[0])} 
+          />
+        </div>
         <button
           className="btn btn-secondary w-full"
           type="submit"
-          disabled={loading || !branchId || !metadata.trim()}
+          disabled={loading || uploading || !branchId || !metadata.trim()}
         >
-          {loading ? <><span className="spinner" /> Submitting…</> : <><span>📝</span> Add Block</>}
+          {loading || uploading ? <><span className="spinner" /> {uploading ? "Uploading to IPFS…" : "Submitting…"}</> : <><span>📝</span> Add Block</>}
         </button>
+      </form>
+    </div>
+  );
+}
+
+export function DoctorAccessForm({ onGrant, onRevoke, loading }) {
+  const [doctorAddr, setDoctorAddr] = useState("");
+
+  const handleGrant = (e) => {
+    e.preventDefault();
+    onGrant(doctorAddr.trim());
+    setDoctorAddr("");
+  };
+
+  const handleRevoke = (e) => {
+    e.preventDefault();
+    onRevoke(doctorAddr.trim());
+    setDoctorAddr("");
+  };
+
+  return (
+    <div className="glass panel fade-up">
+      <div className="panel-header">
+        <span className="panel-icon">⚕️</span>
+        <div>
+          <h2 className="panel-title">Manage Doctor Access</h2>
+          <p className="panel-sub">Grant or revoke write-access to your MedTree branches for a specific doctor's address.</p>
+        </div>
+      </div>
+      <form onSubmit={handleGrant} className="panel-form">
+        <div className="input-group">
+          <label className="input-label">Doctor Ethereum Address</label>
+          <input
+            className="input"
+            type="text"
+            placeholder="e.g. 0x123...abc"
+            value={doctorAddr}
+            onChange={(e) => setDoctorAddr(e.target.value)}
+            required
+            pattern="^0x[a-fA-F0-9]{40}$"
+            title="Must be a valid Ethereum address"
+          />
+        </div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+            <button className="btn btn-primary w-full" type="submit" disabled={loading || !doctorAddr}>
+                {loading ? <span className="spinner" /> : <><span>✅</span> Grant Access</>}
+            </button>
+            <button className="btn btn-secondary w-full" type="button" onClick={handleRevoke} disabled={loading || !doctorAddr}>
+                {loading ? <span className="spinner" /> : <><span>🚫</span> Revoke Access</>}
+            </button>
+        </div>
       </form>
     </div>
   );

@@ -1,19 +1,449 @@
-export const CONTRACT_ADDRESS = "0xA7f2EC8eF9293e3003919797Bd4998Db0ba33CB7";
-
+﻿export const CONTRACT_ADDRESS = '0xD0237DC6E204A9B33eC8c3a3A1C6AAeF1C9F71a1';
 export const ABI = [
-  "event PatientRegistered(address indexed patient)",
-  "event BranchCreated(uint256 indexed branchId, address indexed patient, bool isGenesis)",
-  "event BlockCreated(uint256 indexed branchId, address indexed patient, bytes32 blockHash, bytes32 prevHash)",
+    {
+        "anonymous":  false,
+        "inputs":  [
+                       {
+                           "indexed":  true,
+                           "internalType":  "address",
+                           "name":  "patient",
+                           "type":  "address"
+                       },
+                       {
+                           "indexed":  true,
+                           "internalType":  "address",
+                           "name":  "doctor",
+                           "type":  "address"
+                       }
+                   ],
+        "name":  "AccessGranted",
+        "type":  "event"
+    },
+    {
+        "anonymous":  false,
+        "inputs":  [
+                       {
+                           "indexed":  true,
+                           "internalType":  "address",
+                           "name":  "patient",
+                           "type":  "address"
+                       },
+                       {
+                           "indexed":  true,
+                           "internalType":  "address",
+                           "name":  "doctor",
+                           "type":  "address"
+                       }
+                   ],
+        "name":  "AccessRevoked",
+        "type":  "event"
+    },
+    {
+        "anonymous":  false,
+        "inputs":  [
+                       {
+                           "indexed":  true,
+                           "internalType":  "uint256",
+                           "name":  "branchId",
+                           "type":  "uint256"
+                       },
+                       {
+                           "indexed":  true,
+                           "internalType":  "address",
+                           "name":  "patient",
+                           "type":  "address"
+                       },
+                       {
+                           "indexed":  false,
+                           "internalType":  "bytes32",
+                           "name":  "blockHash",
+                           "type":  "bytes32"
+                       },
+                       {
+                           "indexed":  false,
+                           "internalType":  "bytes32",
+                           "name":  "prevHash",
+                           "type":  "bytes32"
+                       }
+                   ],
+        "name":  "BlockCreated",
+        "type":  "event"
+    },
+    {
+        "anonymous":  false,
+        "inputs":  [
+                       {
+                           "indexed":  true,
+                           "internalType":  "uint256",
+                           "name":  "branchId",
+                           "type":  "uint256"
+                       },
+                       {
+                           "indexed":  true,
+                           "internalType":  "address",
+                           "name":  "patient",
+                           "type":  "address"
+                       },
+                       {
+                           "indexed":  false,
+                           "internalType":  "bool",
+                           "name":  "isGenesis",
+                           "type":  "bool"
+                       }
+                   ],
+        "name":  "BranchCreated",
+        "type":  "event"
+    },
+    {
+        "anonymous":  false,
+        "inputs":  [
+                       {
+                           "indexed":  true,
+                           "internalType":  "address",
+                           "name":  "patient",
+                           "type":  "address"
+                       }
+                   ],
+        "name":  "PatientRegistered",
+        "type":  "event"
+    },
+    {
+        "inputs":  [
+                       {
+                           "internalType":  "uint256",
+                           "name":  "_branchId",
+                           "type":  "uint256"
+                       },
+                       {
+                           "internalType":  "string",
+                           "name":  "_metadata",
+                           "type":  "string"
+                       },
+                       {
+                           "internalType":  "bytes32",
+                           "name":  "_recordHash",
+                           "type":  "bytes32"
+                       }
+                   ],
+        "name":  "addBlockToBranch",
+        "outputs":  [
 
-  "function branchCounter() view returns (uint256)",
-  "function hasGenesisBlock(address) view returns (bool)",
-  "function isPatientRegistered(address _patient) view returns (bool)",
-  "function getPatientBranches(address _patient) view returns (uint256[])",
-  "function getBranchLength(uint256 _branchId) view returns (uint256)",
-  "function getBranchPatient(uint256 _branchId) view returns (address)",
-  "function getBlockDetails(uint256 _branchId, uint256 _blockIndex) view returns (bytes32 blockHash, bytes32 prevHash, string metadata, uint256 timestamp)",
+                    ],
+        "stateMutability":  "nonpayable",
+        "type":  "function"
+    },
+    {
+        "inputs":  [
+                       {
+                           "internalType":  "address",
+                           "name":  "",
+                           "type":  "address"
+                       },
+                       {
+                           "internalType":  "address",
+                           "name":  "",
+                           "type":  "address"
+                       }
+                   ],
+        "name":  "authorizedDoctors",
+        "outputs":  [
+                        {
+                            "internalType":  "bool",
+                            "name":  "",
+                            "type":  "bool"
+                        }
+                    ],
+        "stateMutability":  "view",
+        "type":  "function"
+    },
+    {
+        "inputs":  [
 
-  "function createGenesisBlock(string _metadata, bytes32 _recordHash) returns (uint256)",
-  "function createCollisionBlock(uint256 _parentBranchId, uint256 _parentBlockIndex, string _metadata, bytes32 _recordHash) returns (uint256)",
-  "function addBlockToBranch(uint256 _branchId, string _metadata, bytes32 _recordHash)",
+                   ],
+        "name":  "branchCounter",
+        "outputs":  [
+                        {
+                            "internalType":  "uint256",
+                            "name":  "",
+                            "type":  "uint256"
+                        }
+                    ],
+        "stateMutability":  "view",
+        "type":  "function"
+    },
+    {
+        "inputs":  [
+                       {
+                           "internalType":  "uint256",
+                           "name":  "",
+                           "type":  "uint256"
+                       }
+                   ],
+        "name":  "branches",
+        "outputs":  [
+                        {
+                            "internalType":  "uint256",
+                            "name":  "branchId",
+                            "type":  "uint256"
+                        },
+                        {
+                            "internalType":  "address",
+                            "name":  "patient",
+                            "type":  "address"
+                        },
+                        {
+                            "internalType":  "bool",
+                            "name":  "active",
+                            "type":  "bool"
+                        }
+                    ],
+        "stateMutability":  "view",
+        "type":  "function"
+    },
+    {
+        "inputs":  [
+                       {
+                           "internalType":  "uint256",
+                           "name":  "_parentBranchId",
+                           "type":  "uint256"
+                       },
+                       {
+                           "internalType":  "uint256",
+                           "name":  "_parentBlockIndex",
+                           "type":  "uint256"
+                       },
+                       {
+                           "internalType":  "string",
+                           "name":  "_metadata",
+                           "type":  "string"
+                       },
+                       {
+                           "internalType":  "bytes32",
+                           "name":  "_recordHash",
+                           "type":  "bytes32"
+                       }
+                   ],
+        "name":  "createCollisionBlock",
+        "outputs":  [
+                        {
+                            "internalType":  "uint256",
+                            "name":  "",
+                            "type":  "uint256"
+                        }
+                    ],
+        "stateMutability":  "nonpayable",
+        "type":  "function"
+    },
+    {
+        "inputs":  [
+                       {
+                           "internalType":  "string",
+                           "name":  "_metadata",
+                           "type":  "string"
+                       },
+                       {
+                           "internalType":  "bytes32",
+                           "name":  "_recordHash",
+                           "type":  "bytes32"
+                       }
+                   ],
+        "name":  "createGenesisBlock",
+        "outputs":  [
+                        {
+                            "internalType":  "uint256",
+                            "name":  "",
+                            "type":  "uint256"
+                        }
+                    ],
+        "stateMutability":  "nonpayable",
+        "type":  "function"
+    },
+    {
+        "inputs":  [
+                       {
+                           "internalType":  "uint256",
+                           "name":  "_branchId",
+                           "type":  "uint256"
+                       },
+                       {
+                           "internalType":  "uint256",
+                           "name":  "_blockIndex",
+                           "type":  "uint256"
+                       }
+                   ],
+        "name":  "getBlockDetails",
+        "outputs":  [
+                        {
+                            "internalType":  "bytes32",
+                            "name":  "blockHash",
+                            "type":  "bytes32"
+                        },
+                        {
+                            "internalType":  "bytes32",
+                            "name":  "prevHash",
+                            "type":  "bytes32"
+                        },
+                        {
+                            "internalType":  "string",
+                            "name":  "metadata",
+                            "type":  "string"
+                        },
+                        {
+                            "internalType":  "uint256",
+                            "name":  "timestamp",
+                            "type":  "uint256"
+                        }
+                    ],
+        "stateMutability":  "view",
+        "type":  "function"
+    },
+    {
+        "inputs":  [
+                       {
+                           "internalType":  "uint256",
+                           "name":  "_branchId",
+                           "type":  "uint256"
+                       }
+                   ],
+        "name":  "getBranchLength",
+        "outputs":  [
+                        {
+                            "internalType":  "uint256",
+                            "name":  "",
+                            "type":  "uint256"
+                        }
+                    ],
+        "stateMutability":  "view",
+        "type":  "function"
+    },
+    {
+        "inputs":  [
+                       {
+                           "internalType":  "uint256",
+                           "name":  "_branchId",
+                           "type":  "uint256"
+                       }
+                   ],
+        "name":  "getBranchPatient",
+        "outputs":  [
+                        {
+                            "internalType":  "address",
+                            "name":  "",
+                            "type":  "address"
+                        }
+                    ],
+        "stateMutability":  "view",
+        "type":  "function"
+    },
+    {
+        "inputs":  [
+                       {
+                           "internalType":  "address",
+                           "name":  "_patient",
+                           "type":  "address"
+                       }
+                   ],
+        "name":  "getPatientBranches",
+        "outputs":  [
+                        {
+                            "internalType":  "uint256[]",
+                            "name":  "",
+                            "type":  "uint256[]"
+                        }
+                    ],
+        "stateMutability":  "view",
+        "type":  "function"
+    },
+    {
+        "inputs":  [
+                       {
+                           "internalType":  "address",
+                           "name":  "doctor",
+                           "type":  "address"
+                       }
+                   ],
+        "name":  "grantAccess",
+        "outputs":  [
+
+                    ],
+        "stateMutability":  "nonpayable",
+        "type":  "function"
+    },
+    {
+        "inputs":  [
+                       {
+                           "internalType":  "address",
+                           "name":  "",
+                           "type":  "address"
+                       }
+                   ],
+        "name":  "hasGenesisBlock",
+        "outputs":  [
+                        {
+                            "internalType":  "bool",
+                            "name":  "",
+                            "type":  "bool"
+                        }
+                    ],
+        "stateMutability":  "view",
+        "type":  "function"
+    },
+    {
+        "inputs":  [
+                       {
+                           "internalType":  "address",
+                           "name":  "_patient",
+                           "type":  "address"
+                       }
+                   ],
+        "name":  "isPatientRegistered",
+        "outputs":  [
+                        {
+                            "internalType":  "bool",
+                            "name":  "",
+                            "type":  "bool"
+                        }
+                    ],
+        "stateMutability":  "view",
+        "type":  "function"
+    },
+    {
+        "inputs":  [
+                       {
+                           "internalType":  "address",
+                           "name":  "",
+                           "type":  "address"
+                       },
+                       {
+                           "internalType":  "uint256",
+                           "name":  "",
+                           "type":  "uint256"
+                       }
+                   ],
+        "name":  "patientBranches",
+        "outputs":  [
+                        {
+                            "internalType":  "uint256",
+                            "name":  "",
+                            "type":  "uint256"
+                        }
+                    ],
+        "stateMutability":  "view",
+        "type":  "function"
+    },
+    {
+        "inputs":  [
+                       {
+                           "internalType":  "address",
+                           "name":  "doctor",
+                           "type":  "address"
+                       }
+                   ],
+        "name":  "revokeAccess",
+        "outputs":  [
+
+                    ],
+        "stateMutability":  "nonpayable",
+        "type":  "function"
+    }
 ];
