@@ -87,7 +87,7 @@ describe("EMRTreeLedger", function () {
     it("should revert when called by non-owner", async function () {
       await expect(
         emr.connect(patient2).createCollisionBlock(0n, 0n, "Hack", hash("H"))
-      ).to.be.revertedWith("Only patient can update their records");
+      ).to.be.revertedWith("Not patient or authorized doctor");
     });
 
     it("should revert with invalid parent block index", async function () {
@@ -125,7 +125,7 @@ describe("EMRTreeLedger", function () {
     it("should revert when called by non-owner", async function () {
       await expect(
         emr.connect(patient2).addBlockToBranch(0n, "Hack", hash("H"))
-      ).to.be.revertedWith("Only patient can update their records");
+      ).to.be.revertedWith("Not patient or authorized doctor");
     });
 
     it("should revert with empty hash", async function () {

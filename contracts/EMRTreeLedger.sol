@@ -20,13 +20,22 @@ contract EMRTreeLedger {
     mapping(uint256 => Branch)    public branches;
     uint256 public branchCounter;
     mapping(address => bool)      public hasGenesisBlock;
+    mapping(address => mapping(address => bool)) public authorizedDoctors;
 
     event BranchCreated(uint256 indexed branchId, address indexed patient, bool isGenesis);
     event BlockCreated(uint256 indexed branchId, address indexed patient, bytes32 blockHash, bytes32 prevHash);
     event PatientRegistered(address indexed patient);
+    event AccessGranted(address indexed patient, address indexed doctor);
+    event AccessRevoked(address indexed patient, address indexed doctor);
 
-    modifier onlyPatient(uint256 _branchId) {
-        require(branches[_branchId].patient == msg.sender, "Only patient can update their records");
+    modifier onlyPatientOrAuthorizedDoctor(uint256 _branchId) {
+        address patient = branches[_branchId].patient;
+        require(msg.sender == patient || authorizedDoctors[patient][msg.sender], "Not patient or authorized doctor");
+        _;
+    }
+
+    modifier onlyPatientAddress() {
+        require(hasGenesisBlock[msg.sender], "Patient not registered");
         _;
     }
 
@@ -38,6 +47,16 @@ contract EMRTreeLedger {
     modifier nonEmptyHash(bytes32 _hash) {
         require(_hash != bytes32(0), "Record hash cannot be empty");
         _;
+    }
+
+    function grantAccess(address doctor) external onlyPatientAddress {
+        authorizedDoctors[msg.sender][doctor] = true;
+        emit AccessGranted(msg.sender, doctor);
+    }
+
+    function revokeAccess(address doctor) external onlyPatientAddress {
+        authorizedDoctors[msg.sender][doctor] = false;
+        emit AccessRevoked(msg.sender, doctor);
     }
 
     function createGenesisBlock(
@@ -76,11 +95,12 @@ contract EMRTreeLedger {
     )
         external
         branchExists(_parentBranchId)
-        onlyPatient(_parentBranchId)
+        onlyPatientOrAuthorizedDoctor(_parentBranchId)
         nonEmptyHash(_recordHash)
         returns (uint256)
     {
         Branch storage parentBranch = branches[_parentBranchId];
+        address patient = parentBranch.patient;
         require(_parentBlockIndex < parentBranch.blocks.length, "Invalid parent block index");
 
         bytes32 parentHash = parentBranch.blocks[_parentBlockIndex].blockHash;
@@ -88,7 +108,7 @@ contract EMRTreeLedger {
 
         Branch storage newBranch = branches[newBranchId];
         newBranch.branchId = newBranchId;
-        newBranch.patient  = msg.sender;
+        newBranch.patient  = patient;
         newBranch.active   = true;
 
         newBranch.blocks.push(Block({
@@ -98,10 +118,10 @@ contract EMRTreeLedger {
             timestamp : block.timestamp
         }));
 
-        patientBranches[msg.sender].push(newBranchId);
+        patientBranches[patient].push(newBranchId);
 
-        emit BranchCreated(newBranchId, msg.sender, false);
-        emit BlockCreated(newBranchId, msg.sender, _recordHash, parentHash);
+        emit BranchCreated(newBranchId, patient, false);
+        emit BlockCreated(newBranchId, patient, _recordHash, parentHash);
         return newBranchId;
     }
 
@@ -109,8 +129,9 @@ contract EMRTreeLedger {
         uint256 _branchId,
         string memory _metadata,
         bytes32 _recordHash
-    ) external branchExists(_branchId) onlyPatient(_branchId) nonEmptyHash(_recordHash) {
+    ) external branchExists(_branchId) onlyPatientOrAuthorizedDoctor(_branchId) nonEmptyHash(_recordHash) {
         Branch storage branch = branches[_branchId];
+        address patient = branch.patient;
         bytes32 prevHash = branch.blocks[branch.blocks.length - 1].blockHash;
 
         branch.blocks.push(Block({
@@ -120,7 +141,7 @@ contract EMRTreeLedger {
             timestamp : block.timestamp
         }));
 
-        emit BlockCreated(_branchId, msg.sender, _recordHash, prevHash);
+        emit BlockCreated(_branchId, patient, _recordHash, prevHash);
     }
 
     function getPatientBranches(address _patient) external view returns (uint256[] memory) {
